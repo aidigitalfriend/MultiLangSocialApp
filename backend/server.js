@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -13,7 +13,7 @@ const { TranslatorTextClient } = require('@azure/cognitiveservices-translatortex
 const { CognitiveServicesCredentials } = require('@azure/ms-rest-azure-js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 const sequelize = require('./config/database');
 
 // Models
