@@ -7,6 +7,8 @@ const BG = '#F5F5F5';
 const WHITE = '#FFFFFF';
 const DARK = '#1A1A2E';
 
+const goTo = (url) => { if (Platform.OS === 'web') window.location.href = url; };
+
 export default function HomeScreen({ navigation }) {
   const aboutRef = useRef(null);
   const featuresRef = useRef(null);
@@ -32,10 +34,10 @@ export default function HomeScreen({ navigation }) {
           <TouchableOpacity onPress={() => scrollTo(featuresRef)}>
             <Text style={styles.navLink}>Features</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('AppPage')}>
+          <TouchableOpacity onPress={() => goTo('https://app.v4u.ai')}>
             <Text style={styles.navLink}>App</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerBtn} onPress={() => navigation.navigate('Signin')}>
+          <TouchableOpacity style={styles.headerBtn} onPress={() => goTo('https://auth.v4u.ai/signin')}>
             <Text style={styles.headerBtnText}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -50,10 +52,10 @@ export default function HomeScreen({ navigation }) {
             Break every language barrier. Chat, call, and connect with anyone — your voice, their language.
           </Text>
           <View style={styles.heroBtns}>
-            <TouchableOpacity style={styles.primaryBtn} onPress={() => navigation.navigate('Signup')}>
+            <TouchableOpacity style={styles.primaryBtn} onPress={() => goTo('https://auth.v4u.ai/signup')}>
               <Text style={styles.primaryBtnText}>Get Started Free</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('AppPage')}>
+            <TouchableOpacity style={styles.secondaryBtn} onPress={() => goTo('https://app.v4u.ai')}>
               <Text style={styles.secondaryBtnText}>Download App</Text>
             </TouchableOpacity>
           </View>
@@ -127,7 +129,7 @@ export default function HomeScreen({ navigation }) {
         {/* CTA */}
         <View style={[styles.section, styles.ctaSection]}>
           <Text style={styles.ctaTitle}>Ready to break language barriers?</Text>
-          <TouchableOpacity style={styles.primaryBtn} onPress={() => navigation.navigate('Signup')}>
+          <TouchableOpacity style={styles.primaryBtn} onPress={() => goTo('https://auth.v4u.ai/signup')}>
             <Text style={styles.primaryBtnText}>Create Free Account</Text>
           </TouchableOpacity>
         </View>
@@ -137,7 +139,7 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.footerLogo}>Voice 4U</Text>
           <Text style={styles.footerDesc}>Real-time multilingual communication for everyone.</Text>
           <View style={styles.footerLinks}>
-            <TouchableOpacity onPress={() => navigation.navigate('AppPage')}>
+            <TouchableOpacity onPress={() => goTo('https://app.v4u.ai')}>
               <Text style={styles.footerLink}>App</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => Linking.openURL('https://v4u.ai/terms')}>

@@ -7,6 +7,8 @@ const BG = '#F5F5F5';
 const WHITE = '#FFFFFF';
 const DARK = '#1A1A2E';
 
+const goTo = (url) => { if (Platform.OS === 'web') window.location.href = url; };
+
 export default function AppScreen({ navigation }) {
   const installPWA = () => {
     if (Platform.OS === 'web' && window.__pwaInstallPrompt) {
@@ -20,14 +22,14 @@ export default function AppScreen({ navigation }) {
     <View style={styles.root}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => goTo('https://v4u.ai')}>
           <Text style={styles.logo}>V4U</Text>
         </TouchableOpacity>
         <View style={styles.nav}>
-          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          <TouchableOpacity onPress={() => goTo('https://v4u.ai')}>
             <Text style={styles.navLink}>Home</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerBtn} onPress={() => navigation.navigate('Signin')}>
+          <TouchableOpacity style={styles.headerBtn} onPress={() => goTo('https://auth.v4u.ai/signin')}>
             <Text style={styles.headerBtnText}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -99,10 +101,10 @@ export default function AppScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Get Started</Text>
           <View style={styles.authRow}>
-            <TouchableOpacity style={styles.primaryBtn} onPress={() => navigation.navigate('Signup')}>
+            <TouchableOpacity style={styles.primaryBtn} onPress={() => goTo('https://auth.v4u.ai/signup')}>
               <Text style={styles.primaryBtnText}>Sign Up</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.outlineBtn} onPress={() => navigation.navigate('Signin')}>
+            <TouchableOpacity style={styles.outlineBtn} onPress={() => goTo('https://auth.v4u.ai/signin')}>
               <Text style={styles.outlineBtnText}>Sign In</Text>
             </TouchableOpacity>
           </View>
@@ -112,7 +114,7 @@ export default function AppScreen({ navigation }) {
         <View style={styles.footer}>
           <Text style={styles.footerLogo}>Voice 4U</Text>
           <View style={styles.footerLinks}>
-            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+            <TouchableOpacity onPress={() => goTo('https://v4u.ai')}>
               <Text style={styles.footerLink}>Home</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => Linking.openURL('https://v4u.ai/terms')}>

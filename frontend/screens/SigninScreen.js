@@ -7,14 +7,16 @@ const WHITE = '#FFFFFF';
 const DARK = '#1A1A2E';
 const BG = '#F5F5F5';
 
+const goTo = (url) => { if (Platform.OS === 'web') window.location.href = url; };
+
 export default function SigninScreen({ navigation }) {
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSignin = async () => {
-    if (!phone || !password) {
-      Alert.alert('Error', 'Please enter phone and password');
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter email and password');
       return;
     }
     setLoading(true);
@@ -22,11 +24,13 @@ export default function SigninScreen({ navigation }) {
       const response = await fetch('https://api.v4u.ai/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password }),
+        body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
       if (data.token) {
-        navigation.reset({ index: 0, routes: [{ name: 'Chat', params: { userId: data.userId, token: data.token } }] });
+        if (Platform.OS === 'web') {
+          window.location.href = `https://global.v4u.ai#userId=${data.userId}&token=${data.token}`;
+        }
       } else {
         Alert.alert('Error', data.error || 'Invalid credentials');
       }
@@ -39,7 +43,7 @@ export default function SigninScreen({ navigation }) {
   return (
     <View style={styles.root}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => goTo('https://v4u.ai')}>
           <Text style={styles.logo}>V4U</Text>
         </TouchableOpacity>
       </View>
@@ -48,8 +52,8 @@ export default function SigninScreen({ navigation }) {
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to continue chatting in any language</Text>
 
-          <Text style={styles.label}>Phone Number</Text>
-          <TextInput style={styles.input} placeholder="+1 234 567 890" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+          <Text style={styles.label}>Email</Text>
+          <TextInput style={styles.input} placeholder="you@example.com" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
 
           <Text style={styles.label}>Password</Text>
           <TextInput style={styles.input} placeholder="Enter your password" value={password} onChangeText={setPassword} secureTextEntry />

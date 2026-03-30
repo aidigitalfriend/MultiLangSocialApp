@@ -9,15 +9,15 @@ const BG = '#F5F5F5';
 
 export default function ResetPasswordScreen({ navigation }) {
   const [step, setStep] = useState('request'); // 'request' | 'reset'
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleRequestReset = async () => {
-    if (!phone) {
-      Alert.alert('Error', 'Please enter your phone number');
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email');
       return;
     }
     setLoading(true);
@@ -25,11 +25,11 @@ export default function ResetPasswordScreen({ navigation }) {
       const response = await fetch('https://api.v4u.ai/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ email }),
       });
       const data = await response.json();
       if (data.success) {
-        Alert.alert('Code Sent', 'A reset code has been sent to your phone');
+        Alert.alert('Code Sent', 'A reset code has been sent to your email');
         setStep('reset');
       } else {
         Alert.alert('Error', data.error || 'Could not send reset code');
@@ -58,7 +58,7 @@ export default function ResetPasswordScreen({ navigation }) {
       const response = await fetch('https://api.v4u.ai/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, code, newPassword }),
+        body: JSON.stringify({ email, code, newPassword }),
       });
       const data = await response.json();
       if (data.success) {
@@ -77,7 +77,7 @@ export default function ResetPasswordScreen({ navigation }) {
   return (
     <View style={styles.root}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => { if (Platform.OS === 'web') window.location.href = 'https://v4u.ai'; }}>
           <Text style={styles.logo}>V4U</Text>
         </TouchableOpacity>
       </View>
@@ -86,14 +86,14 @@ export default function ResetPasswordScreen({ navigation }) {
           <Text style={styles.title}>{step === 'request' ? 'Forgot Password?' : 'Reset Password'}</Text>
           <Text style={styles.subtitle}>
             {step === 'request'
-              ? 'Enter your phone number and we\'ll send you a reset code'
+              ? 'Enter your email and we\'ll send you a reset code'
               : 'Enter the code and your new password'}
           </Text>
 
           {step === 'request' ? (
             <>
-              <Text style={styles.label}>Phone Number</Text>
-              <TextInput style={styles.input} placeholder="+1 234 567 890" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+              <Text style={styles.label}>Email</Text>
+              <TextInput style={styles.input} placeholder="you@example.com" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
 
               <TouchableOpacity style={[styles.btn, loading && { opacity: 0.6 }]} onPress={handleRequestReset} disabled={loading}>
                 <Text style={styles.btnText}>{loading ? 'Sending...' : 'Send Reset Code'}</Text>

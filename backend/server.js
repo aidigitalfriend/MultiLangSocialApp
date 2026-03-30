@@ -65,17 +65,21 @@ const authenticate = (req, res, next) => {
 
 // Signup
 app.post('/signup', async (req, res) => {
-  const { phone, username, language, voiceSample, password } = req.body;
+  const { email, username, password } = req.body;
+  if (!email || !username || !password) {
+    return res.status(400).json({ error: 'Email, username, and password are required' });
+  }
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await User.create({ phone, username, language, voiceSample, password: hashedPassword });
+  const user = await User.create({ email, username, password: hashedPassword });
   const token = jwt.sign({ id: user.id }, process.env.SECRET_KEY);
   res.json({ userId: user.id, token });
 });
 
 // Signin
 app.post('/signin', async (req, res) => {
-  const { phone, password } = req.body;
-  const user = await User.findOne({ where: { phone } });
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
+  const user = await User.findOne({ where: { email } });
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.status(400).json({ error: 'Invalid credentials' });
   }
@@ -86,32 +90,32 @@ app.post('/signin', async (req, res) => {
 // Forgot password - generate reset code
 const resetCodes = new Map();
 app.post('/forgot-password', async (req, res) => {
-  const { phone } = req.body;
-  const user = await User.findOne({ where: { phone } });
+  const { email } = req.body;
+  const user = await User.findOne({ where: { email } });
   if (!user) {
-    return res.status(400).json({ error: 'No account found with that phone number' });
+    return res.status(400).json({ error: 'No account found with that email' });
   }
   const code = String(Math.floor(100000 + Math.random() * 900000));
-  resetCodes.set(phone, { code, expires: Date.now() + 15 * 60 * 1000 });
-  // TODO: Send code via SMS when SMS provider is configured
-  console.log(`Reset code for ${phone}: ${code}`);
+  resetCodes.set(email, { code, expires: Date.now() + 15 * 60 * 1000 });
+  // TODO: Send code via email when email provider is configured
+  console.log(`Reset code for ${email}: ${code}`);
   res.json({ success: true });
 });
 
 // Reset password with code
 app.post('/reset-password', async (req, res) => {
-  const { phone, code, newPassword } = req.body;
-  const entry = resetCodes.get(phone);
+  const { email, code, newPassword } = req.body;
+  const entry = resetCodes.get(email);
   if (!entry || entry.code !== code || Date.now() > entry.expires) {
     return res.status(400).json({ error: 'Invalid or expired reset code' });
   }
-  const user = await User.findOne({ where: { phone } });
+  const user = await User.findOne({ where: { email } });
   if (!user) {
     return res.status(400).json({ error: 'User not found' });
   }
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   await user.update({ password: hashedPassword });
-  resetCodes.delete(phone);
+  resetCodes.delete(email);
   res.json({ success: true });
 });
 

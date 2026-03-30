@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 
 const TEAL = '#00897B';
 const TEAL_DARK = '#00695C';
@@ -11,7 +11,11 @@ export default function SettingsScreen({ route, navigation }) {
   const { token } = route.params;
 
   const handleLogout = () => {
-    navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+    if (Platform.OS === 'web') {
+      localStorage.removeItem('v4u_userId');
+      localStorage.removeItem('v4u_token');
+      window.location.href = 'https://v4u.ai';
+    }
   };
 
   return (
