@@ -1,7 +1,9 @@
 const { Sequelize } = require('sequelize');
 
-// Strip ssl query param from URL - handle via dialectOptions instead
-const dbUrl = (process.env.DATABASE_URL || '').replace(/[?&]ssl=[^&]*/g, '');
+// Normalize DB URL: strip ssl param and fix dialect scheme for Sequelize
+const dbUrl = (process.env.DATABASE_URL || '')
+  .replace(/^postgresql\+\w+:\/\//, 'postgres://')
+  .replace(/[?&]ssl=[^&]*/g, '');
 
 const sequelize = new Sequelize(dbUrl, {
   dialect: 'postgres',
