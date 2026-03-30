@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Platform } from 'react-native';
 
 const TEAL = '#00897B';
 const TEAL_DARK = '#00695C';
@@ -13,18 +13,26 @@ export default function SigninScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const e = {};
+    if (!email.trim()) e.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = 'Please enter a valid email address';
+    if (!password) e.password = 'Password is required';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
 
   const handleSignin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter email and password');
-      return;
-    }
+    if (!validate()) return;
     setLoading(true);
+    setErrors({});
     try {
       const response = await fetch('https://api.v4u.ai/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
       const data = await response.json();
       if (data.token) {
@@ -32,10 +40,14 @@ export default function SigninScreen({ navigation }) {
           window.location.href = `https://global.v4u.ai#userId=${data.userId}&token=${data.token}`;
         }
       } else {
-        Alert.alert('Error', data.error || 'Invalid credentials');
+        if (data.field) {
+          setErrors({ [data.field]: data.error });
+        } else {
+          setErrors({ general: data.error || 'Sign in failed. Please try again.' });
+        }
       }
     } catch (e) {
-      Alert.alert('Error', 'Network error. Please try again.');
+      setErrors({ general: 'Network error. Please check your connection and try again.' });
     }
     setLoading(false);
   };
@@ -52,11 +64,15 @@ export default function SigninScreen({ navigation }) {
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to continue chatting in any language</Text>
 
+          {errors.general ? <Text style={styles.errorBanner}>{errors.general}</Text> : null}
+
           <Text style={styles.label}>Email</Text>
-          <TextInput style={styles.input} placeholder="you@example.com" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+          <TextInput style={[styles.input, errors.email && styles.inputError]} placeholder="you@example.com" value={email} onChangeText={(t) => { setEmail(t); setErrors(e => ({...e, email: undefined})); }} keyboardType="email-address" autoCapitalize="none" />
+          {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
           <Text style={styles.label}>Password</Text>
-          <TextInput style={styles.input} placeholder="Enter your password" value={password} onChangeText={setPassword} secureTextEntry />
+          <TextInput style={[styles.input, errors.password && styles.inputError]} placeholder="Enter your password" value={password} onChangeText={(t) => { setPassword(t); setErrors(e => ({...e, password: undefined})); }} secureTextEntry />
+          {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
           <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')}>
             <Text style={styles.forgotLink}>Forgot Password?</Text>
@@ -88,6 +104,9 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 14, color: '#888', marginBottom: 24 },
   label: { fontSize: 13, fontWeight: '600', color: '#555', marginBottom: 6, marginTop: 12 },
   input: { backgroundColor: BG, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, borderWidth: 1, borderColor: '#E0E0E0' },
+  inputError: { borderColor: '#D32F2F' },
+  errorText: { color: '#D32F2F', fontSize: 12, marginTop: 4 },
+  errorBanner: { color: '#D32F2F', fontSize: 14, backgroundColor: '#FFEBEE', borderRadius: 8, padding: 12, marginBottom: 12, textAlign: 'center' },
   forgotLink: { color: TEAL, fontSize: 13, fontWeight: '600', textAlign: 'right', marginTop: 10 },
   btn: { backgroundColor: TEAL, borderRadius: 28, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
   btnText: { color: WHITE, fontSize: 16, fontWeight: '700' },
